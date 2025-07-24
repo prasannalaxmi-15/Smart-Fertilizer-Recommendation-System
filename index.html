@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Fertilizer Recommendation System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        }
+        
+        .input-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .result-card {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .crop-image-container {
+            min-height: 180px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        
+        .crop-image {
+            transition: transform 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Hero Section -->
+        <header class="gradient-bg text-white py-16">
+            <div class="container mx-auto px-4 text-center">
+                <div class="flex justify-center mb-8">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/467630af-09b6-46eb-bc48-e484b41e7716.png" alt="Green leaf icon with a nutrient cycle diagram in the center representing soil fertility" />
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Smart Fertilizer Recommendation</h1>
+                <p class="text-xl max-w-2xl mx-auto">Get personalized fertilizer recommendations based on your soil parameters and crop needs</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-12 max-w-6xl">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-12">
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Input Form Section -->
+                    <div class="p-8">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Enter Soil Parameters</h2>
+                        
+                        <form id="fertilizer-form" class="space-y-6">
+                            <div>
+                                <label for="crop-type" class="block text-sm font-medium text-gray-700 mb-1">Crop Type</label>
+                                <select id="crop-type" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                    <option value="">Select a crop</option>
+                                    <option value="wheat">Wheat</option>
+                                    <option value="rice">Rice</option>
+                                    <option value="corn">Corn</option>
+                                    <option value="soybean">Soybean</option>
+                                    <option value="cotton">Cotton</option>
+                                    <option value="vegetables">Vegetables</option>
+                                    <option value="fruits">Fruits</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="soil-type" class="block text-sm font-medium text-gray-700 mb-1">Soil Type</label>
+                                <select id="soil-type" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                    <option value="">Select soil type</option>
+                                    <option value="sandy">Sandy</option>
+                                    <option value="loamy">Loamy</option>
+                                    <option value="clay">Clay</option>
+                                    <option value="silt">Silt</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="nitrogen" class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+                                    <span>Nitrogen Level (kg/ha)</span>
+                                    <span id="nitrogen-value" class="font-bold">0</span>
+                                </label>
+                                <input type="range" id="nitrogen" min="0" max="200" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer input-range">
+                            </div>
+                            
+                            <div>
+                                <label for="phosphorus" class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+                                    <span>Phosphorus Level (kg/ha)</span>
+                                    <span id="phosphorus-value" class="font-bold">0</span>
+                                </label>
+                                <input type="range" id="phosphorus" min="0" max="100" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer input-range">
+                            </div>
+                            
+                            <div>
+                                <label for="potassium" class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+                                    <span>Potassium Level (kg/ha)</span>
+                                    <span id="potassium-value" class="font-bold">0</span>
+                                </label>
+                                <input type="range" id="potassium" min="0" max="150" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer input-range">
+                            </div>
+                            
+                            <div>
+                                <label for="ph" class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+                                    <span>Soil pH Level</span>
+                                    <span id="ph-value" class="font-bold">7.0</span>
+                                </label>
+                                <input type="range" id="ph" min="4" max="9" step="0.1" value="7.0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer input-range">
+                            </div>
+                            
+                            <div>
+                                <label for="moisture" class="block text-sm font-medium text-gray-700 mb-1 flex justify-between">
+                                    <span>Soil Moisture (%)</span>
+                                    <span id="moisture-value" class="font-bold">50</span>
+                                </label>
+                                <input type="range" id="moisture" min="0" max="100" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer input-range">
+                            </div>
+                            
+                            <button type="submit" class="w-full gradient-bg text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-md">
+                                Get Fertilizer Recommendation
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Visualization Section -->
+                    <div class="bg-gray-50 p-8 flex items-center">
+                        <div class="w-full">
+                            <div class="crop-image-container mb-6">
+                                <img id="crop-image" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/3b03db87-2d03-4ee0-9365-40628a8e47a7.png" alt="Agricultural field with young crop plants in neat rows under sunlight" class="w-full h-auto object-cover crop-image" />
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                                    <div class="text-2xl font-bold text-green-600" id="nitrogen-indicator">0</div>
+                                    <div class="text-sm text-gray-500">Nitrogen</div>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                                    <div class="text-2xl font-bold text-blue-600" id="phosphorus-indicator">0</div>
+                                    <div class="text-sm text-gray-500">Phosphorus</div>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                                    <div class="text-2xl font-bold text-orange-600" id="potassium-indicator">0</div>
+                                    <div class="text-sm text-gray-500">Potassium</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-center">
+                                <div class="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+                                    <div id="ph-indicator" class="absolute h-full bg-gradient-to-r from-red-500 via-yellow-400 to-green-500"></div>
+                                </div>
+                            </div>
+                            <div class="text-center text-sm text-gray-600 mt-2">
+                                Current Soil pH: <span id="current-ph" class="font-bold">7.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Section (hidden by default) -->
+            <div id="results-section" class="hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Recommended Fertilizer Plan</h2>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Primary Recommendation -->
+                    <div class="result-card rounded-xl p-6 border-2 border-green-100">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">Primary Recommendation</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Based on your soil test results and crop requirements, our system recommends:</p>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-green-600 font-medium">Fertilizer Type:</span>
+                                <span id="primary-fertilizer" class="font-bold">NPK 20-10-10</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-green-600 font-medium">Application Rate:</span>
+                                <span id="primary-rate" class="font-bold">150 kg/ha</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-green-600 font-medium">Application Timing:</span>
+                                <span id="primary-timing" class="font-bold">Pre-planting</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Secondary Recommendation -->
+                    <div class="result-card rounded-xl p-6 border-2 border-blue-100">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">Secondary Supplement</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">To address specific deficiencies and optimize yield:</p>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-blue-600 font-medium">Supplemental Product:</span>
+                                <span id="secondary-fertilizer" class="font-bold">Urea (46-0-0)</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-blue-600 font-medium">Application Rate:</span>
+                                <span id="secondary-rate" class="font-bold">50 kg/ha</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-blue-600 font-medium">Application Timing:</span>
+                                <span id="secondary-timing" class="font-bold">Top-dress 30 DAP</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Soil Amendment -->
+                    <div class="result-card rounded-xl p-6 border-2 border-amber-100">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">Soil Amendment</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">Long-term soil health improvements:</p>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-amber-600 font-medium">Amendment Type:</span>
+                                <span id="amendment-type" class="font-bold">Lime</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-amber-600 font-medium">Application Rate:</span>
+                                <span id="amendment-rate" class="font-bold">2 ton/ha</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-amber-600 font-medium">Frequency:</span>
+                                <span id="amendment-frequency" class="font-bold">Every 2 years</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Analysis -->
+                <div class="result-card rounded-xl p-6 mt-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Soil Analysis Report</h3>
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parameter</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Your Value</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Optimal Range</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Nitrogen</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" id="nitrogen-result">0 kg/ha</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">120-200 kg/ha</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm" id="nitrogen-status">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Deficient</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Phosphorus</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" id="phosphorus-result">0 kg/ha</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">40-80 kg/ha</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm" id="phosphorus-status">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Deficient</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Potassium</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" id="potassium-result">0 kg/ha</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80-150 kg/ha</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm" id="potassium-status">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Deficient</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Soil pH</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" id="ph-result">7.0</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">6.0-7.5</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm" id="ph-status">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Optimal</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Application Guide -->
+                <div class="result-card rounded-xl p-6 mt-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Application Guidelines</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-medium text-gray-900 mb-2">Application Method</h4>
+                            <p class="text-gray-600 mb-4" id="application-method">Broadcast application followed by incorporation into the top 10-15 cm of soil before planting.</p>
+                            
+                            <h4 class="font-medium text-gray-900 mb-2">Precautions</h4>
+                            <ul class="list-disc pl-5 text-gray-600 space-y-1">
+                                <li>Use protective equipment when handling fertilizers</li>
+                                <li>Store fertilizers in a cool, dry place away from children and animals</li>
+                                <li>Apply fertilizers when rain is not expected for at least 24 hours</li>
+                                <li>Do not apply near water bodies to prevent runoff</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900 mb-2">Expected Results</h4>
+                            <p class="text-gray-600 mb-4">When following these recommendations, you can expect improved plant vigor, increased yield, and better crop quality. Nutrient deficiencies should be corrected within 2-3 weeks of application.</p>
+                            
+                            <h4 class="font-medium text-gray-900 mb-2">Next Steps</h4>
+                            <p class="text-gray-600">Retest soil after 6 months to monitor improvements and adjust recommendations as needed. Consider organic matter additions to improve long-term soil health.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-8">
+            <div class="container mx-auto px-4 text-center">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f550047e-a625-4c5b-8329-3b096bd73ae9.png" alt="Logo of Agricultural Technology Solutions with a leaf and digital circuit design representing smart farming" class="mx-auto mb-6" />
+                <p class="mb-4">Smart Fertilizer Recommendation System</p>
+                <p class="text-sm text-gray-400">© 2023 AgriTech Solutions. All rights reserved.</p>
+                <p class="text-sm text-gray-400 mt-2">Note: These recommendations are based on standard agricultural practices. Local conditions may vary.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Update slider value displays
+        document.getElementById('nitrogen').addEventListener('input', function() {
+            document.getElementById('nitrogen-value').textContent = this.value;
+            document.getElementById('nitrogen-indicator').textContent = this.value;
+        });
+        
+        document.getElementById('phosphorus').addEventListener('input', function() {
+            document.getElementById('phosphorus-value').textContent = this.value;
+            document.getElementById('phosphorus-indicator').textContent = this.value;
+        });
+        
+        document.getElementById('potassium').addEventListener('input', function() {
+            document.getElementById('potassium-value').textContent = this.value;
+            document.getElementById('potassium-indicator').textContent = this.value;
+        });
+        
+        document.getElementById('ph').addEventListener('input', function() {
+            document.getElementById('ph-value').textContent = this.value;
+            document.getElementById('current-ph').textContent = this.value;
+            
+            // Change pH indicator color based on value
+            const ph = parseFloat(this.value);
+            const phIndicator = document.getElementById('ph-indicator');
+            phIndicator.style.width = `${((ph - 4) / 5) * 100}%`;
+            
+            if (ph < 5.5) {
+                phIndicator.className = 'absolute h-full bg-gradient-to-r from-red-500 to-red-400';
+            } else if (ph >= 5.5 && ph < 6.5) {
+                phIndicator.className = 'absolute h-full bg-gradient-to-r from-red-500 via-yellow-400 to-green-400';
+            } else if (ph >= 6.5 && ph < 7.5) {
+                phIndicator.className = 'absolute h-full bg-green-500';
+            } else {
+                phIndicator.className = 'absolute h-full bg-gradient-to-r from-green-500 to-blue-500';
+            }
+        });
+        
+        document.getElementById('moisture').addEventListener('input', function() {
+            document.getElementById('moisture-value').textContent = this.value;
+        });
+        
+        document.getElementById('crop-type').addEventListener('change', function() {
+            const crop = this.value;
+            const cropImage = document.getElementById('crop-image');
+            
+            if (crop === 'wheat') {
+                cropImage.src = 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/79d4146e-bf75-47f2-b124-c845c76c8199.png';
+                cropImage.alt = 'Golden wheat field ready for harvest under sunny skies';
+            } else if (crop === 'rice') {
+                cropImage.src = 'https://placehold.co/800x400';
+                cropImage.alt = 'Lush green rice paddy fields with water reflections in Southeast Asia';
+            } else if (crop === 'corn') {
+                cropImage.src = 'https://placehold.co/800x400';
+                cropImage.alt = 'Healthy corn plants with fully developed ears in an American Midwest field';
+            } else if (crop === 'soybean') {
+                cropImage.src = 'https://placehold.co/800x400';
+                cropImage.alt = 'Soybean plants with green leaves and pods in neat agricultural rows';
+            } else if (crop === 'cotton') {
+                cropImage.src = 'https://placehold.co/800x400';
+                cropImage.alt = 'Cotton field with white fluffy bolls ready for picking under blue sky';
+            } else if (crop === 'vegetables') {
+                cropImage.src = 'https://placehold.co/800x400';
+                cropImage.alt = 'Various vegetables growing in a market garden with irrigation system';
+            } else if (crop === 'fruits') {
+                cropImage.src = 'https://placehold.co/800x400';
+                cropImage.alt = 'Orchard with fruit trees bearing ripe apples under sunlight';
+            } else {
+                cropImage.src = 'https://placehold.co/800x400';
+                cropImage.alt = 'Diverse agricultural landscape with various crops in cultivation';
+            }
+        });
+
+        // Form submission
+        document.getElementById('fertilizer-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const crop = document.getElementById('crop-type').value;
+            const soilType = document.getElementById('soil-type').value;
+            const nitrogen = parseInt(document.getElementById('nitrogen').value);
+            const phosphorus = parseInt(document.getElementById('phosphorus').value);
+            const potassium = parseInt(document.getElementById('potassium').value);
+            const ph = parseFloat(document.getElementById('ph').value);
+            const moisture = parseInt(document.getElementById('moisture').value);
+            
+            // Validate inputs
+            if (!crop || !soilType) {
+                alert('Please select both crop type and soil type');
+                return;
+            }
+            
+            // Process inputs and generate recommendations (simplified logic)
+            let primaryFertilizer = 'NPK 20-10-10';
+            let primaryRate = '150 kg/ha';
+            let primaryTiming = 'Pre-planting';
+            
+            let secondaryFertilizer = 'Urea (46-0-0)';
+            let secondaryRate = '30-50 kg/ha';
+            let secondaryTiming = 'Top-dress 30 DAP';
+            
+            let amendmentType = 'Lime';
+            let amendmentRate = '0.5-1 ton/ha';
+            let amendmentFrequency = 'Every 2 years';
+            
+            // Refine recommendations based on input values (simplified logic)
+            if (nitrogen < 100 && phosphorus < 30 && potassium < 50) {
+                primaryFertilizer = 'NPK 25-20-15';
+                primaryRate = '200 kg/ha';
+            } else if (nitrogen >= 150 && phosphorus >= 40) {
+                primaryFertilizer = 'NPK 15-15-15';
+                primaryRate = '100 kg/ha';
+                secondaryFertilizer = 'Potassium Sulfate (0-0-50)';
+                secondaryRate = '25 kg/ha';
+            }
+            
+            if (ph < 5.5) {
+                amendmentType = 'Dolomitic Lime';
+                amendmentRate = '2-3 ton/ha';
+                amendmentFrequency = 'Annually for 3 years';
+            } else if (ph >= 7.5) {
+                amendmentType = 'Sulfur';
+                amendmentRate = '1 ton/ha';
+                amendmentFrequency = 'As needed based on pH tests';
+            }
+            
+            if (soilType === 'sandy') {
+                primaryFertilizer = 'NPK 18-12-18';
+                primaryRate = '175 kg/ha (split application)';
+                secondaryFertilizer = 'Slow-release Nitrogen';
+            } else if (soilType === 'clay') {
+                primaryFertilizer = 'NPK 15-25-10';
+                secondaryRate = '40 kg/ha (split application)';
+            }
+            
+            // Update results
+            document.getElementById('primary-fertilizer').textContent = primaryFertilizer;
+            document.getElementById('primary-rate').textContent = primaryRate;
+            document.getElementById('primary-timing').textContent = primaryTiming;
+            
+            document.getElementById('secondary-fertilizer').textContent = secondaryFertilizer;
+            document.getElementById('secondary-rate').textContent = secondaryRate;
+            document.getElementById('secondary-timing').textContent = secondaryTiming;
+            
+            document.getElementById('amendment-type').textContent = amendmentType;
+            document.getElementById('amendment-rate').textContent = amendmentRate;
+            document.getElementById('amendment-frequency').textContent = amendmentFrequency;
+            
+            // Update analysis report
+            document.getElementById('nitrogen-result').textContent = nitrogen + ' kg/ha';
+            document.getElementById('phosphorus-result').textContent = phosphorus + ' kg/ha';
+            document.getElementById('potassium-result').textContent = potassium + ' kg/ha';
+            document.getElementById('ph-result').textContent = ph;
+            
+            // Update status indicators
+            updateStatus('nitrogen', nitrogen, crop === 'soybean' ? [60, 120] : [120, 200]);
+            updateStatus('phosphorus', phosphorus, [40, 80]);
+            updateStatus('potassium', potassium, [80, 150]);
+            
+            function updateStatus(element, value, optimalRange) {
+                const statusElement = document.getElementById(element + '-status');
+                const spanElement = statusElement.querySelector('span');
+                
+                if (value < optimalRange[0]) {
+                    spanElement.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800';
+                    spanElement.textContent = 'Deficient';
+                } else if (value >= optimalRange[0] && value <= optimalRange[1]) {
+                    spanElement.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800';
+                    spanElement.textContent = 'Optimal';
+                } else {
+                    spanElement.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800';
+                    spanElement.textContent = 'Excess';
+                }
+            }
+            
+            // Update pH status
+            const phStatusElement = document.getElementById('ph-status');
+            const phSpanElement = phStatusElement.querySelector('span');
+            
+            if (ph < 5.5) {
+                phSpanElement.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800';
+                phSpanElement.textContent = 'Too acidic';
+            } else if (ph >= 5.5 && ph <= 7.5) {
+                phSpanElement.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800';
+                phSpanElement.textContent = 'Optimal';
+            } else {
+                phSpanElement.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800';
+                phSpanElement.textContent = 'Too alkaline';
+            }
+            
+            // Show results section
+            document.getElementById('results-section').classList.remove('hidden');
+            
+            // Scroll to results
+            document.getElementById('results-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>
+
